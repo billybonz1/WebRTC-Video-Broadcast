@@ -33,5 +33,9 @@ io.sockets.on("connection", socket => {
   socket.on("disconnect", () => {
     socket.to(broadcaster).emit("disconnectPeer", socket.id);
   });
+
+  socket.on("end", (roomid) => {
+    socket.to(broadcasters[roomid]).emit("disconnectPeer", socket.id);
+  });
 });
 server.listen(port, () => console.log(`Server is running on port ${port}`));
