@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 
 let broadcaster;
+let broadcasters = [];
 const port = process.env.PORT || 3000;
 
 const http = require("http");
@@ -12,12 +13,13 @@ app.use(express.static(__dirname + "/public"));
 
 io.sockets.on("error", e => console.log(e));
 io.sockets.on("connection", socket => {
-  socket.on("broadcaster", () => {
+  socket.on("broadcaster", (roomid) => {
     broadcaster = socket.id;
-    socket.broadcast.emit("broadcaster");
+    broadcasters[roomid] = socket.id;
+    // socket.broadcast.emit("broadcaster");
   });
-  socket.on("watcher", () => {
-    socket.to(broadcaster).emit("watcher", socket.id);
+  socket.on("watcher", (roomid) => {
+    socket.to(broadcasters[roomid]).emit("watcher", socket.id);
   });
   socket.on("offer", (id, message) => {
     socket.to(id).emit("offer", socket.id, message);
